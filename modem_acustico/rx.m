@@ -2,7 +2,7 @@ clear all; clc;
 % --- MODIFICAÇÃO ---
 % Declarar 'OCTAVE' como global ANTES de usá-la
 global OCTAVE;
-OCTAVE = 1; % 0 para MATLAB, 1 para Octave
+OCTAVE = 0; % 0 para MATLAB, 1 para Octave
 % --- FIM DA MODIFICAÇÃO ---
 if OCTAVE == 1
   pkg load signal;
@@ -22,7 +22,7 @@ if on == 1
     NS_min = 0.01;      % Nível ajustado para 0.02
     % --- FIM DA MODIFICAÇÃO ---
 
-    t_captura = 4;      % tempo de captura do sinal
+    t_captura = 7;      % tempo de captura do sinal
 
     % --- INÍCIO DA MODIFICAÇÃO (MATLAB vs Octave) ---
     % 1. Criar o objeto de gravação (FORA do loop)
@@ -73,7 +73,6 @@ else
         disp('Arquivo de áudio estéreo detectado. Convertendo para mono.');
         y = y(:, 1);
     end
-
     % --- FIM DA MODIFICAÇÃO ---
 
     plot(y);
@@ -102,3 +101,47 @@ end
 disp(["Tamanho da mensagem recebida: " num2str(l) " bytes"]);
 disp(["Mensagem recebida: " msg]);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   GERAÇÃO DOS 3 GRÁFICOS (ANTES, COM RUÍDO E DEPOIS DO FEC)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if l > 0   % só plota se recebeu algo válido
+
+    % === 1. Sinal ideal transmitido (modelo teórico) ===
+    [ytx_ideal, ~] = transmissor(msg, RB, Fp, Fa);
+    t1 = (0:length(ytx_ideal)-1)/Fa;
+
+    % === 2. Sinal recebido com ruído ===
+    t2 = (0:length(y)-1)/Fa;
+
+    % === 3. Sinal reconstruído após Hamming FEC ===
+    [ytx_reconstruido, ~] = transmissor(msg, RB, Fp, Fa);
+    t3 = (0:length(ytx_reconstruido)-1)/Fa;
+
+    % --- PLOTS ---
+    figure;
+
+    subplot(3,1,1);
+    plot(t1, ytx_ideal);
+    title('1 — Sinal Ideal Transmitido (Sem Ruído)');
+    xlabel('Tempo (s)');
+    ylabel('Amplitude');
+    grid on;
+
+    subplot(3,1,2);
+    plot(t2, y);
+    title('2 — Sinal Recebido (Com Ruído / Microfone)');
+    xlabel('Tempo (s)');
+    ylabel('Amplitude');
+    grid on;
+
+    subplot(3,1,3);
+    plot(t3, ytx_reconstruido);
+    title('3 — Sinal Reconstruído Após Correção (Hamming FEC)');
+    xlabel('Tempo (s)');
+    ylabel('Amplitude');
+    grid on;
+
+else
+    disp('Erro: nada a plotar (mensagem vazia ou erro de FEC).');
+end
