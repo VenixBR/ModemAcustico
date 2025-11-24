@@ -1,7 +1,7 @@
-clear all; clc;--
+clear all; clc;
 % Declarar 'OCTAVE' como global ANTES de usá-la
 global OCTAVE;
-OCTAVE = 0; % 0 para MATLAB, 1 para Octave
+OCTAVE = 1; % 0 para MATLAB, 1 para Octave
 if OCTAVE == 1
   pkg load signal;
 pkg load communications;
@@ -66,7 +66,7 @@ else
     end
 
     plot(y);
-end 
+end
 
 % retorna a mensagem em bits e o tamanho dela
 [m,l] = receptor_2(y, RB, Fp, Fa);
