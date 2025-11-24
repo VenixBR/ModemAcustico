@@ -19,12 +19,6 @@ pkg load signal;
 pkg load communications;
 end
 
-% --- INÍCIO DA MODIFICAÇÃO (CORREÇÃO DE ERROS) ---
-% REMOVIDO: hHammingDec = comm.HammingDecoder;
-% (Não precisamos de um objeto para a função 'decode')
-% --- FIM DA MODIFICAÇÃO ---
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %      Sincronizacao com Costas Loop   	    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -95,8 +89,6 @@ end
 b = length(x) - b + length(SFD);
 x_payload = x(b+1:end);
 
-% --- INÍCIO DA MODIFICAÇÃO (LÓGICA FEC) ---
-
 % 1. Pega o tamanho da mensagem (1º byte, NÃO codificado)
 try
     length_bits = x_payload(1:8);
@@ -118,37 +110,17 @@ if length(x_payload) < (8 + encoded_length)
     return;
 end
 
-
-
-
 % 3. Extrai o payload codificado
 encoded_msg_bits = x_payload(9 : 8 + encoded_length);
-
-
-
 
 % 4. Decodifica e CORRIGE a mensagem
 % A entrada deve ser uma coluna
 try
     % SINTAXE: decode(dados, n, k, 'tipo')
     % (n=7, k=4)
+    decoded_msg_bits = hamming74_decode_stream(encoded_msg_bits);
+    decoded_msg_bits_col = decoded_msg_bits;
 
-%disp("Bits antes da correção:");
-%disp(encoded_msg_bits.');     % vetor de bits brutos
-
-%decoded_msg_bits_col = decode(encoded_msg_bits', 7, 4, 'hamming');
-
-decoded_msg_bits = hamming74_decode_stream(encoded_msg_bits);
-
-
-%decoded_msg_bits = hamming74_decode_stream(encoded_msg_bits);
-decoded_msg_bits_col = decoded_msg_bits;
-
-
-
-
- %  disp("Bits depois da correção:");
-%disp(decoded_msg_bits_col.');
 
     disp('***********************************');
     disp('*** MENSAGEM DECODIFICADA (HAMMING) ***');
@@ -169,6 +141,4 @@ end
 x = decoded_msg_bits_col';
 
 % A outra saída da função, 'l', já foi calculada.
-
-% --- FIM DA MODIFICAÇÃO ---
 end

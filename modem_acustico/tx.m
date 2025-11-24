@@ -1,9 +1,7 @@
 
-% --- MODIFICAÇÃO ---
 % Declarar 'OCTAVE' como global ANTES de usá-la
 global OCTAVE;
 OCTAVE = 1; % 0 para MATLAB, 1 para Octave
-% --- FIM DA MODIFICAÇÃO ---
 
 msg = "bAnaNas de Pijamas"; % Agora pode ser "OLA" ou 'OLA'
 RB = 100; % taxa de bits (bps)

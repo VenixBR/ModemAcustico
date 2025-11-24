@@ -19,11 +19,6 @@ if OCTAVE == 1
 pkg load communications;
 end
 
-% --- INÍCIO DA MODIFICAÇÃO (CORREÇÃO DE ERROS) ---
-% REMOVIDO: hHammingEnc = comm.HammingEncoder;
-% (Não precisamos de um objeto para a função 'encode')
-% --- FIM DA MODIFICAÇÃO ---
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Inicio
 % converte o texto para um vetor de bits
@@ -34,21 +29,11 @@ end
 l = length(msg);
 msg_decimal = double(msg);
 
-% --- INÍCIO DA MODIFICAÇÃO (LÓGICA FEC) ---
 % 1. Pega os bits da MENSAGEM (ex: "OLA" = 24 bits)
 msg_bits = reshape(de2bi(msg_decimal, 8)', 1, 8*l);
 
 % 2. Codifica a MENSAGEM com Hamming(7,4)
-% A entrada deve ser uma coluna
-% SINTAXE: encode(dados, n, k, 'tipo')
-% (n=7, k=4)
-
-
-%encoded_msg_bits_col = encode(msg_bits', 7, 4, 'hamming');
-%encoded_msg_bits = encoded_msg_bits_col'; % Transpõe para linha
 encoded_msg_bits = hamming74_encode_stream(msg_bits);
-
-
 
 % 3. Pega os bits de TAMANHO (ex: l=3 -> [00000011])
 length_bits = reshape(de2bi(l, 8)', 1, 8);
@@ -56,7 +41,6 @@ length_bits = reshape(de2bi(l, 8)', 1, 8);
 % 4. Monta o payload final
 payload = [length_bits encoded_msg_bits];
 % --- FIM DA MODIFICAÇÃO ---
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Preambulo do quadro                           %
@@ -66,7 +50,7 @@ payload = [length_bits encoded_msg_bits];
 PRE = [ones(1,10) upsample(ones(1,15),2)];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Marcador de inicio do quadro  (SFD)           %
+%  Marcador de inicio do quadro  (SFD)  32 bits         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 SFD = [1 1 0 0 1 1 1 0 0 0 1 1 1 1 0 0 0 0 1 1 1 0 0 0 1 1 0 0 1 0 1 0];
 

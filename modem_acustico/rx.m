@@ -1,9 +1,7 @@
-clear all; clc;
-% --- MODIFICAÇÃO ---
+clear all; clc;--
 % Declarar 'OCTAVE' como global ANTES de usá-la
 global OCTAVE;
 OCTAVE = 0; % 0 para MATLAB, 1 para Octave
-% --- FIM DA MODIFICAÇÃO ---
 if OCTAVE == 1
   pkg load signal;
 pkg load communications;
@@ -18,13 +16,10 @@ if on == 1
     % captura do sinal de audio
     NS = 0;             % nivel de sinal
 
-    % --- MODIFICAÇÃO (Sensibilidade) ---
     NS_min = 0.01;      % Nível ajustado para 0.02
-    % --- FIM DA MODIFICAÇÃO ---
 
     t_captura = 7;      % tempo de captura do sinal
 
-    % --- INÍCIO DA MODIFICAÇÃO (MATLAB vs Octave) ---
     % 1. Criar o objeto de gravação (FORA do loop)
     % Usa 'Fa' (8000 Hz), 16 bits, 1 canal (mono)
     r = audiorecorder(Fa, 16, 1);
@@ -40,16 +35,13 @@ if on == 1
         % 3. Obter os dados gravados
         y = getaudiodata(r, 'double');
 
-        % --- INÍCIO DA MODIFICAÇÃO (Forçar Mono) ---
         % Verifica se a gravação 'y' é estéreo (tem 2 colunas)
         if size(y, 2) > 1
             disp('Áudio estéreo detectado. Convertendo para mono.');
             % Pega apenas o primeiro canal (ex: o esquerdo)
             y = y(:, 1);
         end
-        % --- FIM DA MODIFICAÇÃO ---
 
-        % --- FIM DA MODIFICAÇÃO ---
 
         if ~isempty(y)
           % Mede o pico de amplitude (valor absoluto)
@@ -67,22 +59,19 @@ if on == 1
 else
     [y, fs] = audioread(filename);
 
-    % --- INÍCIO DA MODIFICAÇÃO (Forçar Mono na Leitura) ---
     % Garante que o arquivo lido também seja forçado para mono
     if size(y, 2) > 1
         disp('Arquivo de áudio estéreo detectado. Convertendo para mono.');
         y = y(:, 1);
     end
-    % --- FIM DA MODIFICAÇÃO ---
 
     plot(y);
-end % <-- MODIFICAÇÃO (Era 'endif')
+end 
 
 % retorna a mensagem em bits e o tamanho dela
 [m,l] = receptor_2(y, RB, Fp, Fa);
 
 % conversao de bits para texto
-% --- MODIFICAÇÃO (Robustez) ---
 if isempty(m) || isempty(l) || l == 0
     disp('Receptor não retornou dados. Mensagem vazia.');
     msg = "";
@@ -96,7 +85,6 @@ else
         msg = "ERRO DE DECODIFICAÇÃO";
     end
 end
-% --- FIM DA MODIFICAÇÃO ---
 
 disp(["Tamanho da mensagem recebida: " num2str(l) " bytes"]);
 disp(["Mensagem recebida: " msg]);
